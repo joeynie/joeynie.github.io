@@ -20,7 +20,7 @@ const projects = await getCollection('projects');
 			<div class="stats-div">
 				<div class="stat">
 					<h3 class="text-glow">{projects.length}</h3>
-					<span>Project{projects.length === 1 '' : 's'}</span>
+					<span>Project{projects.length !== 1 && 's'}</span>
 				</div>
 			</div>
     </Card>
