@@ -24,6 +24,15 @@ const { title, description, image, pagefindIgnore, article } = Astro.props;
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<script is:inline>
+			// 防止主题闪烁，在页面加载前设置主题
+			(function() {
+				const theme = localStorage.getItem('theme') || 
+					(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+				document.documentElement.setAttribute('data-theme', theme);
+			})();
+		</script>
+		
 		<link rel="preload" href="/fonts/Geist.woff2" as="font" type="font/woff2" crossorigin="">
 		<link rel="preload" href="/fonts/GeistMono.woff2" as="font" type="font/woff2" crossorigin="">
 
@@ -40,7 +49,7 @@ const { title, description, image, pagefindIgnore, article } = Astro.props;
 
 		<meta name="og:title" content={title} />
 		{description && <meta name="og:description" content={description} />}
-		<meta name="og:image" content={image?.src || '/img/og.png'} />
+		<meta name="og:image" content={image?.src || '/img/default.webp'} />
 		<meta name="og:url" content={Astro.site} />
 		{!article && <meta name="og:type" content="website" />}
 		<meta name="og:locale" content="en" />

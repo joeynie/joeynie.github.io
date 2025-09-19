@@ -1,5 +1,6 @@
 ---
 import Icon from "./Icon.astro";
+import ThemeToggle from "./ThemeToggle.astro";
 import { name } from 'spectre:globals';
 
 const path = Astro.url.pathname;
@@ -20,10 +21,13 @@ const path = Astro.url.pathname;
       <div id="search-results"></div>
     </li>
   </ul>
-  <button class="mobile-nav-toggle" aria-label="Mobile menu trigger">
-    <Icon type="lucide" name="menu" width={24} height={24} class="menu-closed" />
-    <Icon type="lucide" name="x" width={24} height={24} class="menu-open" />
-  </button>
+  <div class="nav-actions">
+    <ThemeToggle />
+    <button class="mobile-nav-toggle" aria-label="Mobile menu trigger">
+      <Icon type="lucide" name="menu" width={24} height={24} class="menu-closed" />
+      <Icon type="lucide" name="x" width={24} height={24} class="menu-open" />
+    </button>
+  </div>
 </nav>
 <script is:inline>
   const searchElement = document.querySelector('#search');
@@ -196,16 +200,23 @@ const path = Astro.url.pathname;
     outline: none;
   }
 
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   #search {
     background: none;
     border: none;
     outline: none;
     padding: .25rem .5rem;
     width: 160px;
+    color: var(--text-color);
   }
 
   #search::placeholder {
-    color: white;
+    color: var(--text-secondary);
   }
 
   #search:focus {
@@ -216,7 +227,7 @@ const path = Astro.url.pathname;
     position: absolute;
     top: calc(100% + .5rem);
     right: 0;
-    background-color: #252525;
+    background-color: var(--card-bg);
     border: 1px solid var(--primary);
     display: none;
     width: 200%;
@@ -232,8 +243,8 @@ const path = Astro.url.pathname;
     display: none;
     width: 40px;
     height: 40px;
-    background-color: #121212;
-    border: 1px solid #353535;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -257,6 +268,10 @@ const path = Astro.url.pathname;
       padding: 0 1rem;
       padding-top: 1rem;
       transition: all .25s ease;
+    }
+
+    .nav-actions {
+      gap: 0.25rem;
     }
 
     .mobile-nav-toggle {
@@ -285,13 +300,13 @@ const path = Astro.url.pathname;
     }
 
     nav.active {
-      background-color: #181818;
+      background-color: var(--bg-secondary);
     }
 
     nav.active ul {
       opacity: 1;
       pointer-events: all;
-      background-color: #181818;
+      background-color: var(--bg-secondary);
     }
 
     nav ul li {

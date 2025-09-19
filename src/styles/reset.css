@@ -23,8 +23,8 @@
 }
 
 html {
-	color-scheme: dark;
-  background-color: #0b0b0b;
+	color-scheme: dark light;
+  background-color: var(--bg-color);
 }
 
 html,

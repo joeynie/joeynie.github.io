@@ -5,6 +5,31 @@
   /* Used for links */
   --primary-light: #a277ff;
   --primary-lightest: #c2a8fd;
+  
+  /* 暗色主题（默认） */
+  --bg-color: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --text-color: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #333333;
+  --card-bg: #151515;
+}
+
+/* 亮色主题 */
+[data-theme="light"] {
+  --bg-color: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-color: #1a1a1a;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --card-bg: #ffffff;
+}
+
+/* 应用主题变量 */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .overview-list {
@@ -94,8 +119,8 @@ main {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  border: 1px solid #353535;
-  color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   text-decoration: none;
   transition: background-color .15s ease, border .15s ease;
 }
@@ -103,7 +128,7 @@ main {
 .post-container:hover, .post-container:focus-visible {
   background-color: rgba(var(--primary-rgb), .125);
   border: 1px solid var(--primary);
-  color: white;
+  color: var(--text-color);
   text-decoration: none;
 }
 
@@ -122,7 +147,7 @@ main {
 }
 
 .post-date {
-  color: #c7c7c7;
+  color: var(--text-secondary);
 }
 
 .text-glow {
@@ -131,12 +156,12 @@ main {
 }
 
 .block-link {
-  color: white;
+  color: var(--text-color);
   padding: .25rem .5rem;
 }
 
 .block-link:hover, .block-link:focus-visible {
-  color: white;
+  color: var(--text-color);
   background-color: var(--primary);
   text-decoration: none;
   outline: none;
