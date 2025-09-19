@@ -46,7 +46,17 @@ const config = defineConfig({
           title: 'Projects'
         }
       },
-      giscus: false
+      giscus: {
+        repository: GISCUS_REPO,
+        repositoryId: GISCUS_REPO_ID,
+        category: GISCUS_CATEGORY,
+        categoryId: GISCUS_CATEGORY_ID,
+        mapping: GISCUS_MAPPING as any,
+        strict: GISCUS_STRICT === "true",
+        reactionsEnabled: GISCUS_REACTIONS_ENABLED === "true",
+        emitMetadata: GISCUS_EMIT_METADATA === "true",
+        lang: GISCUS_LANG,
+      }
     })
   ]
 });
