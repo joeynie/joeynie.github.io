@@ -8,6 +8,7 @@ import spectre from './package/src';
 
 import node from '@astrojs/node';
 import { spectreDark } from './src/ec-theme';
+import netlify from '@astrojs/netlify';
 
 const {
   GISCUS_REPO,
@@ -24,7 +25,7 @@ const {
 // https://astro.build/config
 const config = defineConfig({
   site: 'https://spectre.lou.gg',
-  output: 'static',
+  output: 'server',
   integrations: [
     expressiveCode({
       themes: [spectreDark],
@@ -59,9 +60,7 @@ const config = defineConfig({
       }
     })
   ],
-  adapter: node({
-    mode: 'standalone'
-  })
+  adapter: netlify()
 });
 
 export default config;
