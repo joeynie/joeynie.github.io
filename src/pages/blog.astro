@@ -1,11 +1,107 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
-const allPosts = Object.values(import.meta.glob('./posts/*.md', { eager: true }));
-const pageTitle = "我的 Astro 学习博客";
+import '../styles/article-list.css';
+
+import { getCollection } from "astro:content";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+import { openGraph } from 'spectre:globals';
+
+const posts = await getCollection('posts', (post) => post.data.draft !== true);
+const tags = posts.flatMap((post) => post.data.tags.map((tag) => tag.id));
 ---
-<BaseLayout pageTitle={pageTitle}>
-  <p>在这里，我将分享我的 Astro 学习之旅。</p>
-  <ul>
-    {allPosts.map((post: any) => <li><a href={post.url}>{post.frontmatter.title}</a></li>)}
-  </ul>
-</BaseLayout>
+<Layout
+  title={openGraph.blog.title || "Blog"}
+  description={openGraph.blog.description}
+	pagefindIgnore
+>
+  <div class="layout-grid-left" slot="left">
+    <Card class="flex-col-card">
+      <h2 class="no-mt">Filter</h2>
+      <ul class="tags-list">
+        {Array.from(new Set(tags)).map((tag) => (
+          <li>
+            <a
+              class="blog-tag"
+              href="/blog"
+              data-tag={tag}
+            >
+              {tag}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  </div>
+  <div class="layout-grid-right" slot="right">
+		<Card>
+			<div class="header-container">
+				<Icon type="lucide" name="rss" width={24} height={24} class='glow-icon' />
+				<h2>Latest Posts</h2>
+			</div>
+			<div class="content-container">
+				{posts.sort((a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime()).map((post) => (
+					<a href={`/blog/${post.id}`} class="post-container" data-tags={post.data.tags.map((tag) => tag.id).join(",")}>
+						<div class="post-header">
+							<h3>{post.data.title}</h3>
+							<span class="post-date">{post.data.createdAt.toLocaleDateString()}</span>
+						</div>
+						<span>{post.data.description}</span>
+					</a>
+				))}
+			</div>
+		</Card>
+  </div>
+</Layout>
+<script>
+  const tags = document.querySelectorAll<HTMLAnchorElement>('.blog-tag');
+  const posts = document.querySelectorAll<HTMLAnchorElement>('.post-container');
+  const url = new URL(window.location.href);
+  const initialTags = url.searchParams.get('tags')?.split(',').filter((tag) => tag.length > 0) || [];
+  const selectedTags = new Set(initialTags);
+
+  function updatePostsVisibility() {
+    posts.forEach((post) => {
+      const postTags = post.dataset.tags!.split(',');
+      // if there are selected tags and the post does not have all of them, hide the post
+      if (selectedTags.size > 0 && ![...selectedTags].every((tag) => postTags.includes(tag))) {
+        post.style.display = 'none';
+      } else {
+        post.style.display = '';
+      }
+    });
+  }
+
+  function updateURL() {
+    // create a "clean" URL for the current page before adding the new query parameters
+    const newUrl = new URL(window.location.pathname, window.location.origin);
+    if (selectedTags.size > 0) {
+      newUrl.searchParams.set('tags', [...selectedTags].join(','));
+    }
+    history.pushState({ tags: [...selectedTags] }, '', newUrl);
+  }
+
+  tags.forEach((tag) => {
+    const tagValue = tag.dataset.tag!;
+    if (selectedTags.has(tagValue)) {
+      tag.classList.add('active');
+    }
+
+    tag.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      tag.classList.toggle('active');
+
+      if (selectedTags.has(tagValue)) {
+        selectedTags.delete(tagValue);
+      } else {
+        selectedTags.add(tagValue);
+      }
+
+      updatePostsVisibility();
+      updateURL();
+    });
+  });
+
+  updatePostsVisibility();
+</script>

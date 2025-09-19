@@ -1,43 +1,42 @@
-# Astro Starter Kit: Minimal
+![Spectre, a terminal-inspired theme for Astro.](./images/README.png)
 
-```sh
-npm create astro@latest -- --template minimal
+Spectre is a terminal-inspired theme for Astro, built using TypeScript and Astro.
+
+## Getting Started
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/louisescher/spectre/tree/master)
+[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/louisescher/spectre/tree/master)
+
+Alternatively, you can create a new Astro project with Spectre like this:
+
+```bash
+# npm
+npm create astro@latest -- --template louisescher/spectre
+
+# pnpm
+pnpm create astro@latest --template louisescher/spectre
+
+# yarn
+yarn create astro --template louisescher/spectre
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Features
 
-## 🚀 Project Structure
+- 100 / 100 Lighthouse performance
+- Responsive for all screen sizes
+- Fully accessible
+- Type-Safe
+- Auto-generated sitemap
+- Markdown / MDX Support
+- Builds on content collections
+- Search powered by [pagefind](https://pagefind.app)
+- Comments powered by [giscus](https://giscus.app) (can be turned off)
+- More!
 
-Inside of your Astro project, you'll see the following folders and files:
+## Curious?
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+Head over to [the preview page](https://spectre.lou.gg) to find out more!
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### Spectre Integration
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+If you want to know more about how the custom integration that is used in the `astro.config.ts` file works, head over to the [integration's own README](https://github.com/louisescher/spectre/tree/master/package)!
