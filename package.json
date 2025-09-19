@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "start": "node dist/server/entry.mjs",
+    "start": "astro preview",
     "preview": "astro preview",
     "astro": "astro",
-    "postbuild": "pagefind --site dist/client"
+    "postbuild": "pagefind --site dist"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.4",

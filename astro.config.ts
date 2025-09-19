@@ -6,7 +6,6 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import spectre from './package/src';
 
-import node from '@astrojs/node';
 import { spectreDark } from './src/ec-theme';
 import netlify from '@astrojs/netlify';
 
@@ -25,7 +24,7 @@ const {
 // https://astro.build/config
 const config = defineConfig({
   site: 'https://spectre.lou.gg',
-  output: 'server',
+  output: 'static',
   integrations: [
     expressiveCode({
       themes: [spectreDark],
@@ -47,20 +46,9 @@ const config = defineConfig({
           title: 'Projects'
         }
       },
-      giscus: {
-        repository: GISCUS_REPO,
-        repositoryId: GISCUS_REPO_ID,
-        category: GISCUS_CATEGORY,
-        categoryId: GISCUS_CATEGORY_ID,
-        mapping: GISCUS_MAPPING as any,
-        strict: GISCUS_STRICT === "true",
-        reactionsEnabled: GISCUS_REACTIONS_ENABLED === "true",
-        emitMetadata: GISCUS_EMIT_METADATA === "true",
-        lang: GISCUS_LANG,
-      }
+      giscus: false
     })
-  ],
-  adapter: netlify()
+  ]
 });
 
 export default config;
