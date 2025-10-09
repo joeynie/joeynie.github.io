@@ -1,0 +1,233 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/Card.astro";
+import LayoutGrid from "../components/LayoutGrid.astro";
+---
+<Layout title="Transfer">
+  <!-- <LayoutGrid> -->
+    <Card slot="left" class="transfer-card">
+      <h2>文本传输</h2>
+      <p class="description">使用 Netlify Blob 安全地保存和分享文本内容</p>
+      
+      <div class="input-group">
+        <label for="text-input">输入内容：</label>
+        <textarea id="text-input" rows="12" placeholder="在这里输入你想保存的文本..."></textarea>
+      </div>
+      
+      <button id="save-button" class="save-button">
+        <span class="button-text">保存到云端</span>
+      </button>
+      
+      <div id="result" class="result-area"></div>
+    </Card>
+
+    <Card slot="right" class="info-card">
+      <h3>使用说明</h3>
+      <ul>
+        <li>✍️ 在左侧输入框中输入你想保存的文本</li>
+        <li>💾 点击"保存到云端"按钮</li>
+        <li>🔗 获取唯一的访问链接</li>
+        <li>📤 分享链接给其他人查看</li>
+      </ul>
+      
+      <h3>特性</h3>
+      <ul>
+        <li>🔒 安全存储在 Netlify Blob</li>
+        <li>⚡ 快速访问</li>
+        <li>🌐 全球 CDN 加速</li>
+        <li>📱 支持所有设备</li>
+      </ul>
+    </Card>
+  <!-- </LayoutGrid> -->
+
+  <style>
+    .transfer-card, .info-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .description {
+      color: var(--text-secondary);
+      margin-top: 0;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--bg-secondary);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    textarea::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .save-button {
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .save-button:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .save-button:active {
+      transform: translateY(0);
+    }
+
+    .save-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result-area {
+      padding: 1rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      min-height: 3rem;
+      color: var(--text-color);
+    }
+
+    .result-area:empty {
+      display: none;
+    }
+
+    .result-area a {
+      color: var(--primary-light);
+      text-decoration: underline;
+    }
+
+    .result-area a:hover {
+      color: var(--primary-lightest);
+    }
+
+    .info-card h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .info-card h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .info-card li {
+      color: var(--text-secondary);
+      padding-left: 0.5rem;
+    }
+
+    @media screen and (max-width: 768px) {
+      textarea {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+
+  <script>
+    const saveButton = document.getElementById('save-button') as HTMLButtonElement | null;
+    const textInput = document.getElementById('text-input') as HTMLTextAreaElement | null;
+    const resultDiv = document.getElementById('result') as HTMLDivElement | null;
+
+    if (!saveButton || !textInput || !resultDiv) {
+      console.error('Required elements not found');
+      throw new Error('页面元素未正确加载');
+    }
+
+    saveButton.addEventListener('click', async () => {
+      const text = textInput.value.trim();
+      if (!text) {
+        resultDiv.innerHTML = '⚠️ 内容不能为空！';
+        resultDiv.style.display = 'block';
+        return;
+      }
+
+      // 禁用按钮，显示加载状态
+      saveButton.disabled = true;
+      const originalText = saveButton.querySelector('.button-text')!.textContent;
+      saveButton.querySelector('.button-text')!.textContent = '保存中...';
+      resultDiv.innerHTML = '📤 正在上传到云端...';
+      resultDiv.style.display = 'block';
+
+      try {
+        // 将文本发送到我们的Netlify Function
+        const response = await fetch('/.netlify/functions/save-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // 构建一个访问链接
+          const accessUrl = `/.netlify/functions/get-data?key=${result.key}`;
+          const viewUrl = `${window.location.origin}/view?key=${result.key}`;
+          
+          resultDiv.innerHTML = `
+            <div style="color: var(--primary); font-weight: 600; margin-bottom: 0.5rem;">
+              ✅ 保存成功！
+            </div>
+            <div style="margin-bottom: 0.5rem;">
+              <strong>访问键：</strong> <code style="background: var(--bg-color); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">${result.key}</code>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <a href="${accessUrl}" target="_blank" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border-radius: 0.25rem; text-decoration: none;">📄 查看 JSON</a>
+              <button onclick="navigator.clipboard.writeText('${viewUrl}')" style="padding: 0.5rem 1rem; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 0.25rem; cursor: pointer;">📋 复制链接</button>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `❌ 保存失败: ${result.error || '未知错误'}`;
+        }
+      } catch (error) {
+        resultDiv.innerHTML = `❌ 保存失败: ${error instanceof Error ? error.message : '网络错误'}`;
+      } finally {
+        // 恢复按钮状态
+        saveButton.disabled = false;
+        saveButton.querySelector('.button-text')!.textContent = originalText!;
+      }
+    });
+  </script>
+</Layout>
