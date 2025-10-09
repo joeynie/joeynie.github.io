@@ -38,6 +38,7 @@ export default async (req: Request, context: Context) => {
       metadata: {
         createdAt: new Date().toISOString(),
         length: text.length.toString(),
+        preview: text.substring(0, 50).replace(/\n/g, ' '),
       },
     });
 

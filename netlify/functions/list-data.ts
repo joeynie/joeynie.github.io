@@ -3,7 +3,10 @@ import { getStore } from '@netlify/blobs';
 
 export default async (req: Request, context: Context) => {
   try {
-    const store = getStore('text-storage');
+    const store = getStore({
+      name: 'text-transfer',
+      siteID: context.site.id,
+    });
     
     // 列出所有的 blob
     const { blobs } = await store.list();

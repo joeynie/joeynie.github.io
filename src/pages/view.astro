@@ -7,7 +7,10 @@ import LayoutGrid from "../components/LayoutGrid.astro";
   <!-- <LayoutGrid slot="right"> -->
     <Card slot="left" class="view-card">
       <div id="list-view">
-        <h2>文本目录</h2>
+        <div class="list-header">
+          <h2>📚 文本目录</h2>
+          <p class="list-subtitle" id="list-count">加载中...</p>
+        </div>
         <div id="list-loading" class="loading">
           <div class="spinner"></div>
           <p>正在加载目录...</p>
@@ -167,69 +170,135 @@ import LayoutGrid from "../components/LayoutGrid.astro";
       font-size: 0.9rem;
     }
 
+    .list-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .list-header h2 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-color);
+    }
+
+    .list-subtitle {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
     .list-content {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 1rem;
     }
 
     .text-item {
-      padding: 1rem;
-      background-color: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 0.5rem;
+      padding: 1.25rem;
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--card-bg) 100%);
+      border: 2px solid var(--border-color);
+      border-radius: 0.75rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .text-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
     }
 
     .text-item:hover {
       border-color: var(--primary);
-      transform: translateX(4px);
-      background-color: var(--card-bg);
+      transform: translateX(8px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .text-item:hover::before {
+      transform: scaleY(1);
     }
 
     .text-item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
     }
 
     .text-item-date {
       font-size: 0.875rem;
       color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
 
     .text-item-length {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      background-color: var(--bg-color);
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
+      font-size: 0.8rem;
+      color: var(--primary-light);
+      background: linear-gradient(135deg, var(--bg-color) 0%, var(--bg-secondary) 100%);
+      padding: 0.375rem 0.75rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      white-space: nowrap;
     }
 
     .text-item-preview {
       color: var(--text-color);
       font-family: 'Geist Mono', monospace;
-      font-size: 0.875rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
-      opacity: 0.8;
+      opacity: 0.85;
+      padding-left: 0.5rem;
+      border-left: 2px solid var(--border-color);
+    }
+
+    .text-item:hover .text-item-preview {
+      opacity: 1;
+      border-left-color: var(--primary);
     }
 
     .empty-state {
       text-align: center;
-      padding: 3rem 1rem;
+      padding: 4rem 2rem;
       color: var(--text-secondary);
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--card-bg) 100%);
+      border-radius: 1rem;
+      border: 2px dashed var(--border-color);
     }
 
     .empty-state h3 {
       color: var(--text-color);
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .empty-state p {
+      font-size: 1rem;
+    }
+
+    .empty-state a {
+      color: var(--primary-light);
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .empty-state a:hover {
+      color: var(--primary);
     }
 
     .back-button-container {
@@ -259,6 +328,7 @@ import LayoutGrid from "../components/LayoutGrid.astro";
     const listLoading = document.getElementById('list-loading');
     const listContent = document.getElementById('list-content');
     const listError = document.getElementById('list-error');
+    const listCount = document.getElementById('list-count');
     const backButton = document.getElementById('back-button');
 
     const loadingDiv = document.getElementById('loading');
@@ -304,6 +374,14 @@ import LayoutGrid from "../components/LayoutGrid.astro";
           if (listLoading) listLoading.style.display = 'none';
           
           if (data.success && data.items) {
+            // 更新计数
+            if (listCount) {
+              const count = data.items.length;
+              listCount.textContent = count === 0 
+                ? '还没有保存的文本' 
+                : `共有 ${count} 篇文本`;
+            }
+
             if (data.items.length === 0) {
               if (listContent) {
                 listContent.innerHTML = `
@@ -318,17 +396,59 @@ import LayoutGrid from "../components/LayoutGrid.astro";
               if (listContent) {
                 listContent.innerHTML = data.items.map(item => {
                   const metadata = item.metadata || {};
-                  const createdAt = metadata.createdAt 
-                    ? new Date(metadata.createdAt).toLocaleString() 
-                    : '未知时间';
-                  const length = metadata.length || 0;
-                  const preview = metadata.preview || '无预览';
+                  
+                  // 处理时间显示
+                  let timeDisplay = '📅 未知时间';
+                  if (metadata.createdAt) {
+                    try {
+                      const date = new Date(metadata.createdAt);
+                      if (!isNaN(date.getTime())) {
+                        const now = new Date();
+                        const diffMs = now.getTime() - date.getTime();
+                        const diffMins = Math.floor(diffMs / 60000);
+                        const diffHours = Math.floor(diffMs / 3600000);
+                        const diffDays = Math.floor(diffMs / 86400000);
+                        
+                        if (diffMins < 1) {
+                          timeDisplay = '📅 刚刚';
+                        } else if (diffMins < 60) {
+                          timeDisplay = `📅 ${diffMins} 分钟前`;
+                        } else if (diffHours < 24) {
+                          timeDisplay = `📅 ${diffHours} 小时前`;
+                        } else if (diffDays < 7) {
+                          timeDisplay = `📅 ${diffDays} 天前`;
+                        } else {
+                          timeDisplay = `📅 ${date.toLocaleDateString('zh-CN', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}`;
+                        }
+                      }
+                    } catch (e) {
+                      console.error('Date parsing error:', e);
+                    }
+                  }
+                  
+                  // 处理字数
+                  const length = parseInt(metadata.length || '0', 10);
+                  const lengthDisplay = length > 0 ? `${length} 字` : '未知';
+                  
+                  // 处理预览文本
+                  let preview = metadata.preview || '(无预览内容)';
+                  // 转义 HTML 特殊字符
+                  preview = preview
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
                   
                   return `
                     <div class="text-item" data-key="${item.key}">
                       <div class="text-item-header">
-                        <span class="text-item-date">📅 ${createdAt}</span>
-                        <span class="text-item-length">${length} 字</span>
+                        <span class="text-item-date">${timeDisplay}</span>
+                        <span class="text-item-length">📝 ${lengthDisplay}</span>
                       </div>
                       <div class="text-item-preview">${preview}</div>
                     </div>
