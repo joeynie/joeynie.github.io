@@ -6,20 +6,35 @@ import LayoutGrid from "../components/LayoutGrid.astro";
 <Layout title="View">
   <!-- <LayoutGrid slot="right"> -->
     <Card slot="left" class="view-card">
-      <h2>查看保存的文本</h2>
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <p>正在加载...</p>
-      </div>
-      <div id="content" class="content-area" style="display: none;">
-        <div class="metadata">
-          <span id="created-at"></span>
-          <span id="text-length"></span>
+      <div id="list-view">
+        <h2>文本目录</h2>
+        <div id="list-loading" class="loading">
+          <div class="spinner"></div>
+          <p>正在加载目录...</p>
         </div>
-        <div class="text-content" id="text-content"></div>
-        <button id="copy-button" class="copy-button">📋 复制文本</button>
+        <div id="list-content" class="list-content" style="display: none;"></div>
+        <div id="list-error" class="error-area" style="display: none;"></div>
       </div>
-      <div id="error" class="error-area" style="display: none;"></div>
+
+      <div id="detail-view" style="display: none;">
+        <div class="back-button-container">
+          <button id="back-button" class="back-button">← 返回目录</button>
+        </div>
+        <h2>文本内容</h2>
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+          <p>正在加载...</p>
+        </div>
+        <div id="content" class="content-area" style="display: none;">
+          <div class="metadata">
+            <span id="created-at"></span>
+            <span id="text-length"></span>
+          </div>
+          <div class="text-content" id="text-content"></div>
+          <button id="copy-button" class="copy-button">📋 复制文本</button>
+        </div>
+        <div id="error" class="error-area" style="display: none;"></div>
+      </div>
     </Card>
 
     <Card slot="right" class="actions-card">
@@ -151,9 +166,101 @@ import LayoutGrid from "../components/LayoutGrid.astro";
       color: var(--text-secondary);
       font-size: 0.9rem;
     }
+
+    .list-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .text-item {
+      padding: 1rem;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .text-item:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+      background-color: var(--card-bg);
+    }
+
+    .text-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .text-item-date {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .text-item-length {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      background-color: var(--bg-color);
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+
+    .text-item-preview {
+      color: var(--text-color);
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      opacity: 0.8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+
+    .empty-state h3 {
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .back-button-container {
+      margin-bottom: 1rem;
+    }
+
+    .back-button {
+      padding: 0.5rem 1rem;
+      background-color: var(--bg-secondary);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: var(--card-bg);
+      border-color: var(--primary);
+    }
   </style>
 
   <script>
+    const listView = document.getElementById('list-view');
+    const detailView = document.getElementById('detail-view');
+    const listLoading = document.getElementById('list-loading');
+    const listContent = document.getElementById('list-content');
+    const listError = document.getElementById('list-error');
+    const backButton = document.getElementById('back-button');
+
     const loadingDiv = document.getElementById('loading');
     const contentDiv = document.getElementById('content');
     const errorDiv = document.getElementById('error');
@@ -167,15 +274,100 @@ import LayoutGrid from "../components/LayoutGrid.astro";
     const urlParams = new URLSearchParams(window.location.search);
     const key = urlParams.get('key');
 
-    if (!key) {
-      if (loadingDiv) loadingDiv.style.display = 'none';
-      if (errorDiv) {
-        errorDiv.textContent = '❌ 缺少访问键参数';
-        errorDiv.style.display = 'block';
-      }
-    } else {
-      // 加载数据
-      fetch(`/.netlify/functions/get-data?key=${key}`)
+    // 显示列表视图
+    function showListView() {
+      if (listView) listView.style.display = 'block';
+      if (detailView) detailView.style.display = 'none';
+      // 更新 URL
+      window.history.pushState({}, '', '/view');
+    }
+
+    // 显示详情视图
+    function showDetailView(selectedKey) {
+      if (listView) listView.style.display = 'none';
+      if (detailView) detailView.style.display = 'block';
+      // 更新 URL
+      window.history.pushState({}, '', `/view?key=${selectedKey}`);
+      loadTextDetail(selectedKey);
+    }
+
+    // 返回按钮
+    if (backButton) {
+      backButton.addEventListener('click', showListView);
+    }
+
+    // 加载文本列表
+    function loadTextList() {
+      fetch('/.netlify/functions/list-data')
+        .then(response => response.json())
+        .then(data => {
+          if (listLoading) listLoading.style.display = 'none';
+          
+          if (data.success && data.items) {
+            if (data.items.length === 0) {
+              if (listContent) {
+                listContent.innerHTML = `
+                  <div class="empty-state">
+                    <h3>📭 还没有保存的文本</h3>
+                    <p>去 <a href="/transfer">创建一个</a> 吧！</p>
+                  </div>
+                `;
+                listContent.style.display = 'block';
+              }
+            } else {
+              if (listContent) {
+                listContent.innerHTML = data.items.map(item => {
+                  const metadata = item.metadata || {};
+                  const createdAt = metadata.createdAt 
+                    ? new Date(metadata.createdAt).toLocaleString() 
+                    : '未知时间';
+                  const length = metadata.length || 0;
+                  const preview = metadata.preview || '无预览';
+                  
+                  return `
+                    <div class="text-item" data-key="${item.key}">
+                      <div class="text-item-header">
+                        <span class="text-item-date">📅 ${createdAt}</span>
+                        <span class="text-item-length">${length} 字</span>
+                      </div>
+                      <div class="text-item-preview">${preview}</div>
+                    </div>
+                  `;
+                }).join('');
+                listContent.style.display = 'flex';
+
+                // 添加点击事件
+                listContent.querySelectorAll('.text-item').forEach(item => {
+                  item.addEventListener('click', () => {
+                    const key = item.getAttribute('data-key');
+                    if (key) showDetailView(key);
+                  });
+                });
+              }
+            }
+          } else {
+            if (listError) {
+              listError.textContent = `❌ ${data.error || '加载列表失败'}`;
+              listError.style.display = 'block';
+            }
+          }
+        })
+        .catch(error => {
+          if (listLoading) listLoading.style.display = 'none';
+          if (listError) {
+            listError.textContent = `❌ 加载失败: ${error.message}`;
+            listError.style.display = 'block';
+          }
+        });
+    }
+
+    // 加载文本详情
+    function loadTextDetail(textKey) {
+      if (loadingDiv) loadingDiv.style.display = 'flex';
+      if (contentDiv) contentDiv.style.display = 'none';
+      if (errorDiv) errorDiv.style.display = 'none';
+
+      fetch(`/.netlify/functions/get-data?key=${textKey}`)
         .then(response => response.json())
         .then(data => {
           if (loadingDiv) loadingDiv.style.display = 'none';
@@ -193,7 +385,7 @@ import LayoutGrid from "../components/LayoutGrid.astro";
 
             // 复制功能
             if (copyButton) {
-              copyButton.addEventListener('click', () => {
+              copyButton.onclick = () => {
                 navigator.clipboard.writeText(data.text).then(() => {
                   const originalText = copyButton.textContent;
                   copyButton.textContent = '✅ 已复制！';
@@ -201,20 +393,20 @@ import LayoutGrid from "../components/LayoutGrid.astro";
                     copyButton.textContent = originalText;
                   }, 2000);
                 });
-              });
+              };
             }
 
             // 下载功能
             if (downloadButton) {
-              downloadButton.addEventListener('click', () => {
+              downloadButton.onclick = () => {
                 const blob = new Blob([data.text], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `text-${key}.txt`;
+                a.download = `text-${textKey}.txt`;
                 a.click();
                 URL.revokeObjectURL(url);
-              });
+              };
             }
           } else {
             if (errorDiv) {
@@ -230,6 +422,13 @@ import LayoutGrid from "../components/LayoutGrid.astro";
             errorDiv.style.display = 'block';
           }
         });
+    }
+
+    // 初始化：根据是否有 key 决定显示列表还是详情
+    if (key) {
+      showDetailView(key);
+    } else {
+      loadTextList();
     }
   </script>
 </Layout>
