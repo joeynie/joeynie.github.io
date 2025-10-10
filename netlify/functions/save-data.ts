@@ -44,7 +44,7 @@ export default async (req: Request, context: Context) => {
     };
 
     // 保存到 Blob（保存为 JSON 字符串）
-    await store.setJSON(key, JSON.stringify(blobData));
+    await store.set(key, JSON.stringify(blobData));
 
     return new Response(
       JSON.stringify({
