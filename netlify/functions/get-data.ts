@@ -32,9 +32,9 @@ export default async (req: Request, context: Context) => {
     });
 
     // 从 Blob 获取数据
-    const text = await store.get(key, { type: "text" });
+    const blobContent = await store.get(key, { type: "text" });
 
-    if (!text) {
+    if (!blobContent) {
       return new Response(
         JSON.stringify({ error: "Text not found or expired" }),
         {
@@ -44,15 +44,24 @@ export default async (req: Request, context: Context) => {
       );
     }
 
-    // 获取元数据
-    const metadata = await store.getMetadata(key);
+    // 解析 JSON 数据
+    let blobData;
+    try {
+      blobData = JSON.parse(blobContent);
+    } catch (e) {
+      // 如果不是 JSON，说明是旧格式的纯文本
+      blobData = {
+        text: blobContent,
+        metadata: {},
+      };
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
         key,
-        text,
-        metadata,
+        text: blobData.text,
+        metadata: blobData.metadata || {},
       }),
       {
         status: 200,

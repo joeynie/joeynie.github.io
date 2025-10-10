@@ -33,14 +33,18 @@ export default async (req: Request, context: Context) => {
     // 生成唯一的键名（使用时间戳 + 随机字符串）
     const key = `text-${Date.now()}-${Math.random().toString(36).substring(7)}`;
 
-    // 保存到 Blob
-    await store.set(key, text, {
+    // 创建包含文本和元数据的对象
+    const blobData = {
+      text: text,
       metadata: {
         createdAt: new Date().toISOString(),
-        length: text.length.toString(),
-        preview: text.substring(0, 50).replace(/\n/g, ' '),
+        length: text.length,
+        preview: text.substring(0, 150).replace(/\n/g, ' '),
       },
-    });
+    };
+
+    // 保存到 Blob（保存为 JSON 字符串）
+    await store.setJSON(key, JSON.stringify(blobData));
 
     return new Response(
       JSON.stringify({
