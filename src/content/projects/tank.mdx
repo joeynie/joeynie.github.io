@@ -1,0 +1,93 @@
+---
+title: Tank Battle
+date: 2023-11
+description: A tank combat game built with Unity and ML-Agents. It supports Local Multiplayer and Reinforcement Learning, featuring full physics, audio, and a dynamic camera system.
+image: ../assets/tank.png
+info:
+  - text: Tutorial
+    link: https://www.bilibili.com/video/BV1ua4y1L7oY
+    icon:
+      type: lucide
+      name: video
+  - text: Unity / ML-Agents / C#
+    icon:
+      type: lucide
+      name: code
+---
+
+Tank Battle 是我在大一时完成的第一个 Unity 项目。它不仅是一个功能完整的双人对战小游戏，我在后续还折腾了一下 Unity ML-Agents 框架，让它支持智能 AI 对战。
+
+## Project Highlights
+
+- **Local Multiplayer**: 支持本地双人对战， 分用两套操作键位。
+- **Reinforcement Learning**: 集成了 ML-Agents 框架，可以训练出有趣的 AI 对手。
+- **Full Game Logic**: 涵盖了移动、射击、Health、Ammo 管理等一套完整的逻辑。
+- **Dynamic Camera System**: 相机会自动锁定两个玩家，并根据彼此的距离动态缩放视野。
+- **Audio System**: 包含引擎轰鸣、射击、爆炸等丰富的音效。
+- **Physics System**: 基于 Rigidbody 实现，碰撞和运动反馈都比较真实。
+
+## Core Modules
+
+### 1. Movement System 
+- 基于 Rigidbody 实现平滑的物理移动。
+- 完整的 Forward, Backward 和 Steering 控制。
+- 会根据坦克的 Idle 或 Moving 状态自动切换引擎音效、产生扬尘效果。
+
+### 2. Attack System 
+- 控制 Shell 的发射频率（Cooldown）。
+- 弹药管理（初始 30 发）。
+- 处理发射点的定位、Projectile 实例化以及射击音效。
+
+### 3. Health System
+- 初始 HP 为 100 点，配套实时显示的 UI Health Bar。
+- 每次被击中会计算一个随机伤害（10-20 点）。
+- 包含死亡检测和 Game Over 逻辑。
+
+### 4. ML-Agents Tank Agent 
+- 实现了 Reinforcement Learning 的 Agent 逻辑。
+- 支持 Continuous Actions（移动、转向）和 Discrete Actions（射击）。
+- 奖励机制：击中敌人 +1，被击中 -0.5。
+- 内置 Heuristic 模式，方便手动测试。
+
+### 5. Projectile System 
+- 负责 Collision Detection 和伤害传递。
+- 生成爆炸粒子效果和播放音效。
+
+### 6. Camera Following 
+- 自动计算两个玩家的中点作为观察中心。
+- 正交相机（Orthographic Camera），根据玩家间距动态调整 Size，非常适合这类双人对战视角。
+
+## Technical Implementation
+
+### ML-Agents Training
+在训练 AI 时，我主要设计了以下环节：
+- **Observation Space**: 包含子弹剩余量等关键游戏状态。
+- **Action Space**:
+  - 连续动作：控制前进/后退速度、转向角速度。
+  - 离散动作：触发射击指令。
+- **Reward Function**: 基于命中反馈进行正负强化。
+
+### Physics & Audio
+- 使用 `OnTriggerEnter` 处理炮弹碰撞。
+- 通过修改 `rigidbody.velocity` 和 `angularVelocity` 来精准控制坦克。
+- 使用 `AudioSource` 组件，并配合 `AudioSource.PlayClipAtPoint` 实现 3D 空间音效。
+
+## Gameplay
+1. **Battle**: 两个玩家在同一台电脑上控制各自的坦克。
+2. **Goal**: 利用障碍物躲避攻击，先将对方 HP 扣减至 0 的人获胜。
+3. **Strategy**: 弹药是有限的，需要控制好节奏，不能一味盲目开火。
+
+## My Reflections
+
+这个项目是我初学Unity跟着教程完成的游戏， 以模仿和尝试为主，收获如下：
+- 熟悉了 Unity 的基础组件和 Scripting。
+- 学会了如何调试物理引擎（Rigidbody、Collision）。
+- 掌握了 UI 系统（Slider 实现血条）和 Audio 系统的集成。
+-  ML-Agents 强化学习框架。
+
+回头看这个项目，虽然代码还有提升空间，但它让我真正理解了如何从零开始，把一个个零散的脚本组合成一个可玩的系统。
+
+## Credits
+项目开发过程中主要参考了 B 站的沙漠坦克大战教程，在此感谢教程作者。
+
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=669929305&bvid=BV1ua4y1L7oY&cid=245850601&p=2" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 400px;"></iframe>

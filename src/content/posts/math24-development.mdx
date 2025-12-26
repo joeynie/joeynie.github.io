@@ -1,0 +1,465 @@
+---
+title: "Math24 游戏开发全记录：从算法到实现的完整历程"
+description: "深入记录开发算24点游戏的完整过程，包括算法设计、GUI开发、状态管理等技术要点和开发心得"
+image: "../assets/Math24.png"
+createdAt: 2024-12-12
+draft: false
+tags:
+  - game-development
+  - cpp
+  - project
+---
+
+## 项目背景与动机
+
+Math24 是我在学习 C++ 和 GUI 开发时完成的大作业项目。算24点是一个经典的数学游戏，但实现一个功能完整、体验良好的游戏应用却涉及多个技术领域：算法设计、GUI 开发、状态管理、文件 I/O 等。
+
+这个项目不仅让我掌握了 C++ 的 GUI 开发，更重要的是让我理解了如何将算法转化为实际可用的应用。
+
+## 技术选型与架构设计
+### 项目架构
+
+```
+Math24/
+├── src/              # 源代码
+│   ├── solver/      # 24点求解算法
+│   ├── gui/         # GUI 界面组件
+│   ├── game/        # 游戏逻辑和状态管理
+│   └── utils/       # 工具函数（日志、文件操作等）
+├── CMakeLists.txt   # 构建配置
+└── README.md
+```
+
+## 核心算法：24点求解
+
+### 问题分析
+
+24点游戏的核心是：给定4个数字，使用加、减、乘、除和括号，能否得到24。
+
+这是一个典型的**搜索问题**，需要：
+1. 枚举所有可能的运算顺序
+2. 尝试所有运算符组合
+3. 处理括号的不同位置
+4. 验证结果是否等于24
+
+### 算法设计思路
+
+#### 方法一：递归回溯
+
+最直观的方法是递归回溯，枚举所有可能的表达式：
+
+```cpp
+// 伪代码示例
+bool solve24(vector<double> nums) {
+    if (nums.size() == 1) {
+        return abs(nums[0] - 24) < 1e-6;  // 浮点数比较
+    }
+    
+    // 选择两个数字进行运算
+    for (int i = 0; i < nums.size(); i++) {
+        for (int j = i + 1; j < nums.size(); j++) {
+            double a = nums[i], b = nums[j];
+            
+            // 尝试四种运算
+            vector<double> next = remove(nums, i, j);
+            
+            next.push_back(a + b);
+            if (solve24(next)) return true;
+            next.pop_back();
+            
+            next.push_back(a - b);
+            if (solve24(next)) return true;
+            next.pop_back();
+            
+            next.push_back(b - a);  // 注意减法的顺序
+            if (solve24(next)) return true;
+            next.pop_back();
+            
+            next.push_back(a * b);
+            if (solve24(next)) return true;
+            next.pop_back();
+            
+            if (b != 0) {
+                next.push_back(a / b);
+                if (solve24(next)) return true;
+                next.pop_back();
+            }
+            
+            if (a != 0) {
+                next.push_back(b / a);
+                if (solve24(next)) return true;
+                next.pop_back();
+            }
+        }
+    }
+    return false;
+}
+```
+
+#### 优化策略
+
+1. **剪枝优化**：如果中间结果已经超过24很多，可以提前剪枝
+2. **去重**：避免重复计算相同的表达式
+3. **表达式生成**：不仅要判断是否有解，还要生成可读的表达式字符串
+
+### 实现细节
+
+#### 浮点数精度问题
+
+由于使用浮点数运算，需要考虑精度问题：
+
+```cpp
+const double EPSILON = 1e-6;
+bool isEqual(double a, double b) {
+    return abs(a - b) < EPSILON;
+}
+```
+
+#### 表达式字符串生成
+
+为了显示给用户，需要生成可读的表达式：
+
+```cpp
+struct Expression {
+    double value;
+    string expr;
+    
+    Expression(double v, string e) : value(v), expr(e) {}
+};
+
+// 在递归过程中构建表达式字符串
+Expression combine(Expression a, Expression b, char op) {
+    double result;
+    string expr;
+    
+    switch(op) {
+        case '+': result = a.value + b.value; break;
+        case '-': result = a.value - b.value; break;
+        case '*': result = a.value * b.value; break;
+        case '/': result = a.value / b.value; break;
+    }
+    
+    // 根据运算符优先级决定是否需要括号
+    expr = formatExpression(a.expr, b.expr, op);
+    return Expression(result, expr);
+}
+```
+
+## GUI 开发与交互设计
+
+### FLTK 基础组件使用
+
+#### 窗口和布局
+
+```cpp
+#include <FL/Fl.H>
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Input.H>
+
+Fl_Window* window = new Fl_Window(800, 600, "Math24");
+Fl_Input* input = new Fl_Input(100, 100, 200, 30, "4 numbers:");
+Fl_Button* solveBtn = new Fl_Button(100, 150, 100, 30, "Solve");
+
+window->end();
+window->show();
+```
+
+#### 事件处理
+
+FLTK 使用回调函数处理事件：
+
+```cpp
+void solveCallback(Fl_Widget* widget, void* data) {
+    Fl_Input* input = (Fl_Input*)data;
+    string numbers = input->value();
+    
+    // 解析输入，调用求解算法
+    vector<int> nums = parseNumbers(numbers);
+    string result = solve24(nums);
+    
+    // 更新结果显示
+    updateResult(result);
+}
+
+solveBtn->callback(solveCallback, input);
+```
+
+### 五种游戏模式的界面设计
+
+#### 模式一：人机解题
+
+界面元素：
+- 文件选择按钮（Load File）
+- 4个数字输入框
+- 求解按钮（Solve）
+- 结果显示区域
+
+实现要点：
+- 文件读取使用 `ifstream`
+- 结果保存到 `*_result.txt` 文件
+- 支持 J、Q、K 转换为 11、12、13
+
+#### 模式二：限时挑战
+
+界面元素：
+- 4个金色数字框（显示题目）
+- 倒计时显示（30秒）
+- 答案输入框
+- 检查按钮（Check answer）
+
+实现要点：
+- 使用 `Fl::add_timeout()` 实现倒计时
+- 倒计时颜色变化：正常 → 红色（12秒） → 放大（8秒）
+- 时间到后自动显示正确答案
+
+```cpp
+void timerCallback(void* data) {
+    GameState* game = (GameState*)data;
+    game->timeLeft--;
+    
+    if (game->timeLeft <= 0) {
+        // 游戏结束，显示答案
+        showAnswer(game->solution);
+    } else {
+        // 更新倒计时显示
+        updateTimerDisplay(game->timeLeft);
+        Fl::repeat_timeout(1.0, timerCallback, data);
+    }
+}
+
+// 启动倒计时
+Fl::add_timeout(1.0, timerCallback, &gameState);
+```
+
+#### 模式三：竞速挑战
+
+界面元素：
+- 题目显示区域
+- 答案输入框
+- 提示按钮（Hint）
+- 计时器（正计时）
+- 进度显示（第几题/10题）
+
+实现要点：
+- 使用 `chrono` 库记录时间
+- 连续10题，自动切换
+- 提示功能：显示最后一步运算
+
+#### 模式四：平行世界
+
+这是最复杂的模式，需要同时管理两个游戏状态。
+
+界面设计：
+- 左右两个题目区域
+- 4个运算符按钮（+、-、*、/）
+- 数字框支持点击选择
+- Reset 和 Swap 按钮
+
+实现要点：
+- 状态同步：每一步操作同时影响两个题目
+- 操作验证：确保两个题目都能继续运算
+- Swap 功能：交换两个数字的位置
+
+```cpp
+class ParallelWorld {
+    GameState world1, world2;
+    
+    void merge(int num1, int num2, char op) {
+        // 同时操作两个世界
+        world1.merge(num1, num2, op);
+        world2.merge(num1, num2, op);
+        
+        // 检查是否都完成
+        if (world1.isComplete() && world2.isComplete()) {
+            checkWin();
+        }
+    }
+};
+```
+
+#### 模式五：时间回溯
+
+界面元素：
+- 目标数字显示（1-100随机）
+- 数字框（某些有特殊标记表示"时间领主庇护"）
+- 回溯按钮
+- 回溯次数显示
+
+实现要点：
+- 状态历史栈：保存每一步的状态
+- 回溯功能：恢复到历史状态
+- 特殊标记：某些数字框不受回溯影响
+
+```cpp
+class TimeBacktrack {
+    stack<GameState> history;
+    vector<bool> protectedBoxes;  // 哪些框受保护
+    
+    void backtrack(int steps) {
+        while (steps > 0 && !history.empty()) {
+            GameState state = history.top();
+            history.pop();
+            
+            // 应用保护规则
+            for (int i = 0; i < protectedBoxes.size(); i++) {
+                if (protectedBoxes[i]) {
+                    // 保持当前值，不回退
+                    state.boxes[i] = currentState.boxes[i];
+                }
+            }
+            
+            currentState = state;
+            steps--;
+        }
+    }
+};
+```
+
+## 状态管理与代码组织
+
+### 游戏状态设计
+
+使用状态模式管理不同游戏模式：
+
+```cpp
+class GameState {
+public:
+    virtual void handleInput(string input) = 0;
+    virtual void update() = 0;
+    virtual void render() = 0;
+};
+
+class SolveMode : public GameState {
+    // 人机解题模式
+};
+
+class TimeChallengeMode : public GameState {
+    int timeLeft;
+    string solution;
+    // 限时挑战模式
+};
+```
+
+### 日志系统实现
+
+实现了一个简单的日志系统，支持不同级别：
+
+```cpp
+enum LogLevel {
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR
+};
+
+class Logger {
+    ofstream logFile;
+    
+public:
+    Logger() {
+        logFile.open("app.log", ios::app);
+    }
+    
+    void log(LogLevel level, string message) {
+        auto now = chrono::system_clock::now();
+        time_t time = chrono::system_clock::to_time_t(now);
+        
+        string levelStr;
+        switch(level) {
+            case DEBUG: levelStr = "DEBUG"; break;
+            case INFO: levelStr = "INFO"; break;
+            case WARNING: levelStr = "WARNING"; break;
+            case ERROR: levelStr = "ERROR"; break;
+        }
+        
+        logFile << put_time(localtime(&time), "%Y-%m-%d %H:%M:%S")
+                << " [" << levelStr << "] " << message << endl;
+    }
+};
+```
+
+日志格式示例：
+```
+2024-12-12 00:47:48 [INFO] Solved: (12+((11+13)/2))
+2024-12-12 08:56:09 [INFO] 13+9+7-5 Correct!
+2024-12-12 10:55:51 [INFO] 10-6+9*2 Incorrect.
+```
+
+## 开发过程中的挑战与解决
+
+### 挑战一：表达式验证
+
+用户输入的表达式需要验证：
+1. 是否使用了给定的4个数字
+2. 每个数字是否只使用一次
+3. 表达式是否合法
+4. 计算结果是否等于24
+
+解决方案：使用表达式解析器，构建语法树验证。
+
+### 挑战二：浮点数精度
+
+24点游戏涉及除法，可能出现浮点数精度问题。
+
+解决方案：
+- 使用 `EPSILON` 常量（1e-6）进行比较
+- 避免不必要的中间计算
+- 在显示结果时格式化输出
+
+### 挑战三：GUI 响应性
+
+在计算过程中，GUI 可能会卡顿。
+
+解决方案：
+- 使用 `Fl::check()` 在计算循环中检查事件
+- 对于复杂计算，考虑使用多线程（虽然 FLTK 不是线程安全的，需要小心处理）
+
+### 挑战四：状态同步（平行世界模式）
+
+两个游戏状态需要完美同步。
+
+解决方案：
+- 使用统一的状态更新函数
+- 每次操作后验证两个状态是否都有效
+- 提供 Reset 功能让用户重新开始
+
+## 项目收获与反思
+
+### 技术收获
+
+1. **C++ GUI 开发**：掌握了 FLTK 的基本使用，理解了事件驱动编程
+2. **算法设计**：深入理解了搜索算法和回溯法
+3. **状态管理**：学会了如何设计和管理复杂的游戏状态
+4. **代码组织**：理解了如何将大型项目分解为模块
+
+### 可以改进的地方
+
+1. **代码重构**：某些函数过长，可以进一步模块化
+2. **错误处理**：可以添加更完善的异常处理机制
+3. **用户体验**：可以添加更多动画效果和视觉反馈
+4. **测试**：缺少单元测试，可以添加测试框架
+
+### 未来扩展方向
+
+1. **网络对战**：支持多人在线对战
+2. **AI 对手**：添加不同难度的 AI 对手
+3. **成就系统**：添加成就和排行榜
+4. **移动端**：移植到移动平台
+
+## 项目链接
+
+- [GitHub 仓库](https://github.com/joeynie/Math24)
+
+## 总结
+
+Math24 项目让我从算法设计到 GUI 开发，从状态管理到用户体验，全方位地锻炼了编程能力。虽然是一个"简单"的24点游戏，但实现一个功能完整、体验良好的应用却需要综合考虑多个方面。
+
+这个项目让我深刻理解了：**好的代码不仅仅是能运行，更要考虑可维护性、可扩展性和用户体验**。
+
+如果你对这个项目感兴趣，欢迎查看源代码或提出建议！
+
+---
+
+**相关标签**：#C++ #游戏开发 #算法 #GUI开发 #FLTK
+

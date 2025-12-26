@@ -8,7 +8,8 @@
   node_bundler = "esbuild"
   external_node_modules = ["@netlify/blobs"]
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[dev]
+  command = "pnpm run dev:astro"  
+  port = 8888
+  targetPort = 4321
+  framework = "astro"

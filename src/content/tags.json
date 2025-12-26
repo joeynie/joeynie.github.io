@@ -1,5 +1,23 @@
 [
   {
     "id": "guide"
+  },
+  {
+    "id": "resource"
+  },
+  {
+    "id": "game-development"
+  },
+  {
+    "id": "cpp"
+  },
+  {
+    "id": "project"
+  },
+  {
+    "id": "front end"
+  },
+  {
+    "id": "unity"
   }
 ]
