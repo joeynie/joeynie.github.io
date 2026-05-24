@@ -19,7 +19,10 @@ const [projects, about, workExperience, quickInfo, socials, publications] = awai
 ]);
 
 const sortedPublications = publications.sort((a, b) => b.data.year - a.data.year);
-const selectedProjects = projects.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()).slice(0, 2);
+const featuredProjectIds = ['sentry-decision', 'rm-simulator'];
+const selectedProjects = featuredProjectIds
+	.map((id) => projects.find((project) => project.id === id))
+	.filter((project): project is NonNullable<typeof project> => project !== undefined);
 
 // biome-ignore lint/style/noNonNullAssertion: Should always be defined.
 const { Content: About } = await render(about!);

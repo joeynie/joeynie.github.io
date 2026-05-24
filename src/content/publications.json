@@ -2,27 +2,44 @@
   {
     "id": 1,
     "title": "GuidedVLA: Specifying Task-Relevant Factors via Plug-and-Play Action Attention Specialization",
-    "authors": "Xiaosong Jia*, Bowen Yang*, Zuhao Ge*, Xian Nie*, Yuchen Zhou*, Cunxin Fan*, et al.",
+    "authors": "Xiaosong Jia*, Bowen Yang*, Zuhao Ge*, Xian Nie*, Yuchen Zhou*, Cunxin Fan*, et al. Equal contribution.",
     "venue": "Robotics: Science and Systems (RSS)",
     "year": 2026,
     "description": "We guide VLA action decoders to focus on task-relevant factors by assigning dedicated attention heads to object grounding, temporal skill logic, and spatial geometry.",
     "featured": true,
     "links": [
       {
+        "text": "Project",
+        "link": "https://guidedvla.github.io/project_page/"
+      },
+      {
         "text": "arXiv",
         "link": "https://arxiv.org/abs/2605.12369"
+      },
+      {
+        "text": "Code",
+        "link": "https://github.com/GuidedVLA/GuidedVLA"
       }
     ]
   },
   {
     "id": 2,
     "title": "TacForeSight: Force-Guided Tactile World Model for Contact-Rich Manipulation",
-    "authors": "Yujie Zang*, Yuhang Zheng*, Xian Nie*, et al.",
+    "authors": "Yujie Zang*, Yuhang Zheng*, Xian Nie*, Yupeng Zheng, Shuai Tian, Songen Gu, Chen Gao, Zining Wang, Shuicheng Yan, Wenchao Ding",
     "venue": "IEEE Robotics and Automation Letters (RA-L), under review",
     "year": 2026,
     "description": "A force-guided tactile world model for contact-rich robotic manipulation.",
     "featured": false,
-    "links": []
+    "links": [
+      {
+        "text": "Project",
+        "link": "https://tacforesight.github.io/ProjectPage/"
+      },
+      {
+        "text": "Paper",
+        "link": "https://tacforesight.github.io/ProjectPage/TacForeSight.pdf"
+      }
+    ]
   },
   {
     "id": 3,
@@ -33,6 +50,10 @@
     "description": "An interactive physical reasoning model for embodied understanding and manipulation.",
     "featured": false,
     "links": [
+      {
+        "text": "Project",
+        "link": "https://mybearyzhang.github.io/ipr-1/"
+      },
       {
         "text": "arXiv",
         "link": "https://arxiv.org/abs/2511.15407"

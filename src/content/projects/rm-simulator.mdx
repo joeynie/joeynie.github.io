@@ -1,0 +1,62 @@
+---
+title: RoboMaster Online Simulator
+date: 2025-07
+description: A Unity-based online RoboMaster simulator for match replay, operator training, dataset collection, and RL — with scene modeling, mecanum control, auto-aim, 2.5D navigation, and multiplayer sync.
+image: ../assets/rm-simulator.png
+info:
+  - text: Team Jiao Loong
+    icon:
+      type: lucide
+      name: shield
+  - text: Unity / Gymnasium / RL
+    icon:
+      type: lucide
+      name: code
+  - text: Not open-sourced
+    icon:
+      type: lucide
+      name: lock
+---
+
+I built and maintained the **online RoboMaster simulator** used by Team Jiao Loong for RoboMaster 2025. It became the main platform for operator practice, internal scrims, decision dataset collection, and RL experiments.
+
+## Why we needed it
+
+2025 rule changes made last season's data mostly obsolete. We needed a place to:
+
+- Run realistic internal matches and Swiss-round scrims
+- Record full match states for sentry decision labeling
+- Train operators before regionals and nationals
+- Host friendly matches with other schools
+
+## Core modules
+
+| Module | What it does |
+|--------|----------------|
+| **Scene modeling** | 2025 arena, robots, rune, and game objects in Unity |
+| **Motion control** | Mecanum chassis physics and actuator control |
+| **Auto-aim** | In-sim turret / targeting pipeline for realistic fights |
+| **2.5D navigation** | Top-down tactical map + path planning overlays |
+| **Online sync** | Multiplayer rooms over Unity Online Services |
+| **UI / referee** | Match HUD, HP, timers, and server-side rule checks |
+
+## Online multiplayer
+
+We upgraded the simulator from LAN-only to **public online rooms**. The hard part was collision handling under client-side physics: moving control and collision to the server caused too much latency, so we kept client simulation with anti-clipping safeguards (speed limits + auto separation).
+
+It was not perfect, but good enough for **data collection and operator training**.
+
+## AI / data generation
+
+The simulator also feeds the decision stack:
+
+- **Match logging** for neural task labeling (70+ labeled games)
+- **Bot framework** with team-level strategy, per-robot traits, and delayed task switching to avoid chaotic flickering
+- **Value-map target selection** (HP, level gap, position) before the full hierarchical bot stack
+- **RL environments** exported to Gymnasium for PPO training
+
+## Role in the larger system
+
+The simulator connects directly to the sentry decision pipeline: collect → label → train → test in Foxglove/Unity → deploy on the real robot.
+
+*Team internal project — code not public.*

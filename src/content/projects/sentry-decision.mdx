@@ -1,0 +1,66 @@
+---
+title: Sentry Decision System
+date: 2025-08
+description: A hybrid decision stack for RoboMaster sentry robots — behavior trees for reliable execution, neural task scoring, and RL-based action selection, built on ROS 2 and our in-house simulator.
+image: ../assets/sentry-decision.png
+info:
+  - text: Team Jiao Loong
+    icon:
+      type: lucide
+      name: shield
+  - text: ROS 2 / PyTorch / RL
+    icon:
+      type: lucide
+      name: code
+  - text: Not open-sourced
+    icon:
+      type: lucide
+      name: lock
+---
+
+I led the **sentry decision system** for Team Jiao Loong at RoboMaster 2025. The goal was to make the sentry more than a patrol bot: it needed to contest runes, cross terrain, prioritize threats, and stay alive under full-match pressure.
+
+## Core idea: two-level decisions
+
+We combined **behavior trees** and **machine learning** instead of using either alone:
+
+- **High level (task selection):** choose what to do — activate the rune, push mid, defend base, resupply, hunt the hero, etc.
+- **Low level (action execution):** turn that task into navigation goals, auto-aim priorities, and referee interactions.
+
+Behavior trees keep the system stable and debuggable; learning handles the messy trade-offs that are hard to hand-tune.
+
+## Task decision (neural scoring)
+
+The high-level model takes a normalized 39-dim match state — time, economy, ammo, and all robot positions/HP — and outputs **scores for candidate behavior subtrees**.
+
+Key pieces:
+
+- **Data pipeline:** 70+ simulator matches with manual labels, plus augmentation from our online simulator
+- **Models tried:** MLP, ResNet, LSTM, Transformer encoder — all reached ~95% test accuracy, but sim behavior mattered more than offline accuracy
+- **Semi-supervised ideas:** VAE reconstruction pretraining + confidence-based pseudo-labeling to reduce bad labels
+
+The scoring head picks the best subtree; if chasing is impossible, it falls back to the highest-scoring navigation target.
+
+## Action execution (behavior trees + RL)
+
+Low-level logic is implemented as BT subtrees. One example is **hunt hero**:
+
+- Raise target priority in auto-aim
+- Detect escape intent (filtered distance-to-supply + velocity angle)
+- Switch to **intercept mode** and block the escape route
+- Otherwise score candidate waypoints with a **visibility map** (height field + Bresenham ray checks)
+
+For learned low-level policies, we moved from Unity ML-Agents to **PPO in Gymnasium** with stable-baselines3 — much faster iteration for target-point selection and aim priority.
+
+## Engineering stack
+
+- **Runtime:** ROS 2 decision node
+- **Debug:** custom Foxglove panels for match-state injection and 3D visualization
+- **Training data:** online simulator + Qt labeling tool
+- **Tactics:** separate lightweight web tactical board for human planning
+
+## Outcome
+
+The system supported our 2024/2025 national championship seasons with rune contests, mid control, hero interception, and resupply logic integrated into one stack.
+
+*Team internal project — code not public.*

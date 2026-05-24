@@ -1,0 +1,53 @@
+---
+title: "Building Javis: A Toy Desktop Agent on Raspberry Pi"
+description: "Notes on a local voice-and-vision assistant prototype — perception, a simple state machine, and tool use with a camera turret."
+image: "../assets/default.webp"
+createdAt: 2025-03-01
+draft: true
+tags:
+  - agent
+  - project
+---
+
+*Draft — expand with screenshots and demos later.*
+
+## Why I built it
+
+Before diving into VLA and embodied AI research, I wanted a small playground for **sense → decide → act** loops that I could run entirely on my own hardware. **Javis** started as that playground: a Raspberry Pi–based desk assistant with a camera turret, local speech, and a lightweight agent loop.
+
+It is very much a **toy prototype**, not a product — but it helped me think about event-driven agents, tool use, and what it feels like to operate a physical node with perception attached.
+
+## What it does today
+
+The current prototype wires together:
+
+- **Perception**: Picamera2 feed, MediaPipe gesture/face detection, local VAD + SenseVoice ASR
+- **Cognition**: rule-based command routing, optional local `llama.cpp` chat with a camera capture tool, simple work-session / slacking reminders
+- **Actuation**: two-axis servo turret, face tracking, TTS feedback, optional desktop notifications to a PC
+- **Interface**: a mobile web console for live view and manual turret control
+
+The architecture is deliberately modular: workers publish events to a central **state machine**, which schedules actions on the turret, audio, or notifier.
+
+```text
+microphone / camera
+  → perception workers (VAD, ASR, gesture, presence)
+  → event bus
+  → state machine
+  → turret / TTS / notifications
+```
+
+## What I learned
+
+Even at toy scale, the hard parts are not the model calls — they are **latency**, **routing**, and **closing the loop** between vision and action. A command like “look left” is easy; making chat reliably trigger a camera tool and respond with what the camera sees is where the agent shape starts to appear.
+
+I also learned to respect constraints: non-streaming ASR, JPEG polling instead of WebRTC, and a single chat queue all limit the experience — but they keep the system understandable on a Pi.
+
+## What's next
+
+This project stays personal and experimental. If I revisit it, I'd like to:
+
+- tighten the executive loop around explicit skills / tools
+- improve streaming and responsiveness in the voice path
+- document hardware setup separately from the software README
+
+For now it remains a side project — a reminder of why I care about agents that can **see, listen, and act** in the real world.
