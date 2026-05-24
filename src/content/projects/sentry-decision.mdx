@@ -2,7 +2,7 @@
 title: Sentry Decision System
 date: 2025-08
 description: A hybrid decision stack for RoboMaster sentry robots — behavior trees for reliable execution, neural task scoring, and RL-based action selection, built on ROS 2 and our in-house simulator.
-image: ../assets/sentry-decision.png
+image: ../assets/sentry-decision-cover.png
 info:
   - text: Team Jiao Loong
     icon:
@@ -12,10 +12,6 @@ info:
     icon:
       type: lucide
       name: code
-  - text: Not open-sourced
-    icon:
-      type: lucide
-      name: lock
 ---
 
 I led the **sentry decision system** for Team Jiao Loong at RoboMaster 2025. The goal was to make the sentry more than a patrol bot: it needed to contest runes, cross terrain, prioritize threats, and stay alive under full-match pressure.
@@ -32,6 +28,8 @@ Behavior trees keep the system stable and debuggable; learning handles the messy
 ## Task decision (neural scoring)
 
 The high-level model takes a normalized 39-dim match state — time, economy, ammo, and all robot positions/HP — and outputs **scores for candidate behavior subtrees**.
+
+![Decision pipeline: VAE state encoding, sequence model, and subtree scoring head](/img/RM/decision_pipeline.png)
 
 Key pieces:
 
@@ -50,6 +48,8 @@ Low-level logic is implemented as BT subtrees. One example is **hunt hero**:
 - Switch to **intercept mode** and block the escape route
 - Otherwise score candidate waypoints with a **visibility map** (height field + Bresenham ray checks)
 
+![Visibility-aware waypoint scoring on the arena map](/img/RM/VisibilityMap.png)
+
 For learned low-level policies, we moved from Unity ML-Agents to **PPO in Gymnasium** with stable-baselines3 — much faster iteration for target-point selection and aim priority.
 
 ## Engineering stack
@@ -57,7 +57,13 @@ For learned low-level policies, we moved from Unity ML-Agents to **PPO in Gymnas
 - **Runtime:** ROS 2 decision node
 - **Debug:** custom Foxglove panels for match-state injection and 3D visualization
 - **Training data:** online simulator + Qt labeling tool
-- **Tactics:** separate lightweight web tactical board for human planning
+- **Map tooling:** OpenCV-based keypoint / region annotation for decision and navigation
+
+![Foxglove debug panel with injected match state](/img/RM/foxglove-panel.png)
+
+![Keypoint annotation tool](/img/RM/point_choose.png)
+
+![Region annotation tool](/img/RM/area_choose.png)
 
 ## Outcome
 

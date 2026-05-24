@@ -2,7 +2,7 @@
 title: RoboMaster Online Simulator
 date: 2025-07
 description: A Unity-based online RoboMaster simulator for match replay, operator training, dataset collection, and RL — with scene modeling, mecanum control, auto-aim, 2.5D navigation, and multiplayer sync.
-image: ../assets/rm-simulator.png
+image: ../assets/rm-simulator-cover.png
 info:
   - text: Team Jiao Loong
     icon:
@@ -12,10 +12,6 @@ info:
     icon:
       type: lucide
       name: code
-  - text: Not open-sourced
-    icon:
-      type: lucide
-      name: lock
 ---
 
 I built and maintained the **online RoboMaster simulator** used by Team Jiao Loong for RoboMaster 2025. It became the main platform for operator practice, internal scrims, decision dataset collection, and RL experiments.
@@ -44,7 +40,13 @@ I built and maintained the **online RoboMaster simulator** used by Team Jiao Loo
 
 We upgraded the simulator from LAN-only to **public online rooms**. The hard part was collision handling under client-side physics: moving control and collision to the server caused too much latency, so we kept client simulation with anti-clipping safeguards (speed limits + auto separation).
 
+![Online match room](/img/RM/simulator_room.png)
+
 It was not perfect, but good enough for **data collection and operator training**.
+
+## In-match view
+
+![In-simulator match HUD and gameplay](/img/RM/simulator_game.png)
 
 ## AI / data generation
 
