@@ -32,7 +32,26 @@ const socials = defineCollection({
     id: z.number(),
     icon: z.union([lucideIconSchema, simpleIconSchema]),
     text: z.string(),
-    link: z.string().url(),
+    link: z.union([z.string().url(), z.string().startsWith("/")]),
+  })
+});
+
+const publications = defineCollection({
+  loader: file("src/content/publications.json"),
+  schema: z.object({
+    id: z.number(),
+    title: z.string(),
+    authors: z.string(),
+    venue: z.string(),
+    year: z.coerce.number(),
+    description: z.string().optional(),
+    featured: z.boolean().optional().default(false),
+    links: z.array(
+      z.object({
+        text: z.string(),
+        link: z.union([z.string().url(), z.string().startsWith("/")]),
+      })
+    ),
   })
 });
 
@@ -87,4 +106,4 @@ const projects = defineCollection({
   })
 });
 
-export const collections = { tags, posts, projects, other, quickInfo, socials, workExperience };
+export const collections = { tags, posts, projects, publications, other, quickInfo, socials, workExperience };

@@ -1,0 +1,80 @@
+---
+import '../styles/article-list.css';
+import '../styles/index.css';
+
+import { getCollection } from "astro:content";
+import Card from "../components/Card.astro";
+import Icon from "../components/Icon.astro";
+import Layout from "../layouts/Layout.astro";
+
+const publications = await getCollection('publications');
+const sortedPublications = publications.sort((a, b) => b.data.year - a.data.year);
+---
+
+<Layout
+	title="Research"
+	description="Publications and research by Xian Nie."
+	pagefindIgnore
+>
+  <div class="layout-grid-left" slot="left">
+    <Card class="flex-col-card">
+      <h2 class="no-mt">Publications</h2>
+      <div class="stats-div">
+        <div class="stat">
+          <h3 class="text-glow">{publications.length}</h3>
+          <span>Paper{publications.length === 1 ? '' : 's'}</span>
+        </div>
+      </div>
+    </Card>
+  </div>
+  <div class="layout-grid-right" slot="right">
+    <Card>
+      <div class="header-container">
+        <Icon type='lucide' name="book-open" width={24} height={24} class='glow-icon' />
+        <h2>Research</h2>
+      </div>
+      <div class="content-container">
+        {sortedPublications.map((pub) => (
+          <article class="publication-entry">
+            <h3 class="publication-title">{pub.data.title}</h3>
+            <p class="publication-authors">{pub.data.authors}</p>
+            <p class="publication-venue">{pub.data.venue}, {pub.data.year}</p>
+            {pub.data.description && <p class="publication-desc">{pub.data.description}</p>}
+            {pub.data.links.length > 0 && (
+              <div class="publication-links">
+                {pub.data.links.map((link) => (
+                  <a
+                    href={link.link}
+                    target={link.link.startsWith('http') ? '_blank' : undefined}
+                    rel={link.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  >
+                    {link.text}
+                  </a>
+                ))}
+              </div>
+            )}
+          </article>
+        ))}
+      </div>
+    </Card>
+  </div>
+</Layout>
+
+<style>
+  .stats-div {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat h3 {
+    font-size: 2em;
+    margin: 0;
+    margin-bottom: .5rem;
+  }
+</style>

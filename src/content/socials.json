@@ -7,5 +7,23 @@
     },
     "text": "GitHub",
     "link": "https://github.com/joeynie"
+  },
+  {
+    "id": 2,
+    "icon": {
+      "type": "simple-icons",
+      "name": "googlescholar"
+    },
+    "text": "Google Scholar",
+    "link": "https://scholar.google.com/citations?user=E3BuSZQAAAAJ&hl=en"
+  },
+  {
+    "id": 3,
+    "icon": {
+      "type": "lucide",
+      "name": "file-text"
+    },
+    "text": "CV",
+    "link": "/cv_0524.pdf"
   }
 ]

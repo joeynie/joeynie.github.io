@@ -3,9 +3,9 @@
     "id": 1,
     "icon": {
       "type": "lucide",
-      "name": "cake"
+      "name": "graduation-cap"
     },
-    "text": "20 year old"
+    "text": "CS @ SJTU"
   },
   {
     "id": 2,
@@ -13,7 +13,6 @@
       "type": "lucide",
       "name": "earth"
     },
-    "type": "lucide",
     "text": "Shanghai, China"
   }
 ]

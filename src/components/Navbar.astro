@@ -13,6 +13,10 @@ const path = Astro.url.pathname;
     </li>
     <li class="nav-separator">/</li>
     <li>
+      <a href="/research" class:list={{ active: path.startsWith('/research') }}>Research</a>
+    </li>
+    <li class="nav-separator">/</li>
+    <li>
       <a href="/projects" class:list={{ active: path.startsWith('/projects') }}>Projects</a>
     </li>
     <li class="nav-separator">/</li>

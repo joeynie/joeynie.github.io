@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "GuidedVLA: Specifying Task-Relevant Factors via Plug-and-Play Action Attention Specialization",
+    "authors": "Xiaosong Jia*, Bowen Yang*, Zuhao Ge*, Xian Nie*, Yuchen Zhou*, Cunxin Fan*, et al.",
+    "venue": "Robotics: Science and Systems (RSS)",
+    "year": 2026,
+    "description": "We guide VLA action decoders to focus on task-relevant factors by assigning dedicated attention heads to object grounding, temporal skill logic, and spatial geometry.",
+    "featured": true,
+    "links": [
+      {
+        "text": "arXiv",
+        "link": "https://arxiv.org/abs/2605.12369"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "TacForeSight: Force-Guided Tactile World Model for Contact-Rich Manipulation",
+    "authors": "Yujie Zang*, Yuhang Zheng*, Xian Nie*, et al.",
+    "venue": "IEEE Robotics and Automation Letters (RA-L), under review",
+    "year": 2026,
+    "description": "A force-guided tactile world model for contact-rich robotic manipulation.",
+    "featured": false,
+    "links": []
+  },
+  {
+    "id": 3,
+    "title": "IPR-1: Interactive Physical Reasoner",
+    "authors": "M Zhang, L Zhuo, T Tan, G Xie, X Nie, Y Li, R Zhao, Z He, Z Wang, J Cai, et al.",
+    "venue": "CVPR",
+    "year": 2026,
+    "description": "An interactive physical reasoning model for embodied understanding and manipulation.",
+    "featured": false,
+    "links": [
+      {
+        "text": "arXiv",
+        "link": "https://arxiv.org/abs/2511.15407"
+      }
+    ]
+  }
+]

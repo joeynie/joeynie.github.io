@@ -86,4 +86,147 @@
   flex-direction: row;
   gap: .75rem;
   align-items: center;
+  text-decoration: none;
+}
+
+.profile-card {
+  align-items: flex-start;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.profile-subtitle {
+  margin: -0.5rem 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.hero-figure,
+.experience-figure {
+  margin: 0 0 1.25rem;
+}
+
+.hero-image,
+.experience-image {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-color);
+  display: block;
+}
+
+.hero-figure figcaption,
+.experience-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.champion-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.champion-figure {
+  margin: 0;
+}
+
+.champion-image {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border-color);
+  display: block;
+}
+
+.champion-figure figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.champion-caption {
+  margin: 0 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+@media screen and (max-width: 640px) {
+  .champion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.header-container {
+  justify-content: flex-start;
+}
+
+.section-link {
+  margin-left: auto;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.section-link:hover,
+.section-link:focus-visible {
+  color: var(--text-color);
+}
+
+.publication-entry {
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.publication-entry:not(:last-child) {
+  margin-bottom: 1rem;
+}
+
+.publication-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.publication-authors,
+.publication-venue,
+.publication-desc {
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.publication-authors,
+.publication-desc {
+  color: var(--text-secondary);
+}
+
+.publication-venue {
+  font-size: 0.925rem;
+}
+
+.publication-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.publication-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.publication-links a:hover,
+.publication-links a:focus-visible {
+  border-color: var(--primary);
+  background-color: rgba(140, 92, 245, .125);
 }

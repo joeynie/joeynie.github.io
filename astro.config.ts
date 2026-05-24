@@ -34,18 +34,18 @@ const config = defineConfig({
     spectre({
       name: 'Seraph',
       themeColor: '#8c5cf5',
-      twitterHandle: '@yourhandle',
       openGraph: {
         home: {
-          title: 'Seraph',
-          description: 'A minimalistic theme for Astro.'
+          title: 'Seraph — Xian Nie',
+          description: 'Personal homepage of Xian Nie. Research in VLA, embodied AI, and robotics.'
         },
         blog: {
           title: 'Blog',
-          description: 'News and guides for Seraph.'
+          description: 'Notes and posts by Xian Nie.'
         },
         projects: {
-          title: 'Projects'
+          title: 'Projects',
+          description: 'Selected projects by Xian Nie.'
         }
       },
       giscus: {
