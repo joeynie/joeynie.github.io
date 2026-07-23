@@ -1,0 +1,41 @@
+---
+title: "Fold-Lab Notes: When Two Folds Look the Same"
+description: "Side notes from a personal origami tooling project — why foldable sheets are awkward for video predictors, and an early attempt to measure that gap."
+image: ../assets/default.webp
+createdAt: 2026-05-02
+draft: false
+tags:
+  - origami
+  - notes
+---
+
+I fold paper for fun. Fold-lab started as a small playground: describe a crease pattern, export a fold trajectory, optionally render it. Along the way I kept bumping into a research-shaped question that is easy to state and hard to measure.
+
+Here is a Blender playback of one exported fold sequence — not a learned model, just the trajectory pipeline moving a sheet:
+
+<video src="/img/fold.mp4" controls playsinline style="width:100%;max-width:640px;margin:1rem auto;display:block;"></video>
+
+## The awkward bit
+
+From a camera, two sheets can look almost identical while the hidden state is different — valley vs mountain, left vs right diagonal, layer A on top vs layer B, a crease that is “active” vs one that is only drawn. A world model that predicts the next RGB frame has little reason to care. Physics does.
+
+So the failure mode is not “the model is a bit blurry.” It is “the model is blind to a difference that will dominate the next few seconds of motion.”
+
+## What I built so far
+
+Mostly scaffolding, not a paper:
+
+- A JS path that turns crease patterns into forward fold trajectories
+- Pair generators for deliberately confusing cases (valley/mountain, mirrored diagonals, layer order, micro-offsets, …)
+- A rough **Hidden Consequence Score** (HCS): compare how much a predictor thinks two near-identical starts will diverge, versus how much the true futures diverge
+- Blender rendering for demos like the clip above
+
+HCS ≈ 0 means “blind to the hidden difference.” HCS ≈ 1 means “sees it about as strongly as the ground-truth futures differ.”
+
+The early HCS runs are still noisy; some pair types come out invalid under the current matching heuristic. I am not dressing that up as a result.
+
+## Why I am writing this anyway
+
+Because the *question* is clearer than the *method*. If a model cannot tell valley from mountain when the silhouette matches, then stacking more frames of the same appearance will not fix foldable-sheet prediction. You need either better state, or a predictor that is allowed to switch dynamics when a crease activates.
+
+Fold-lab stays a hobby project. If I later get a stable HCS table on rendered pairs, I will update this note. For now it is a bookmark: origami is a nice stress test for “same pixels, different future.”

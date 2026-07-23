@@ -1,0 +1,66 @@
+---
+title: Manipulation Data Toolkit (xArm / AgileX)
+date: 2026-06
+description: Station software for collecting synchronized robot, camera, and tactile episodes — teach pendant and VR teleop paths, aligned dumps for training and inference.
+image: ../assets/default.webp
+info:
+  - text: TARS / lab tooling
+    icon:
+      type: lucide
+      name: bot
+  - text: xArm · AgileX · sensors
+    icon:
+      type: lucide
+      name: cpu
+  - text: Not open-sourced
+    icon:
+      type: lucide
+      name: lock
+---
+
+Station-side toolkit for **collect → (optional) train → infer** on single-arm setups. I use it mainly on an **xArm7** cell; the same patterns cover **AgileX**-style stations where the arm, wrist cameras, and contact sensors must stay time-aligned.
+
+Code stays private. Below is the public shape of the system.
+
+## Scope
+
+| Stage | Role |
+|-------|------|
+| **Collect** | Pedal-driven episodes: arm state, wrist cameras, depth camera, dual tactile, fingertip force |
+| **Teleop** | VR Cartesian servo + gripper, recorded in the same episode layout |
+| **Infer** | Shared runtime hooks so a trained policy can reuse the same device stack |
+
+Output is episode folders with synchronized pickles (arm / gripper / cameras / tactile), compatible with our internal training format.
+
+## Collection modes
+
+**Teach (drag).** Pedal starts recording; the arm is put into teach mode; the operator moves the arm and gripper by hand; pedal stops, homes, and writes the episode.
+
+**VR teleop.** A dedicated teleop process owns arm servo and gripper commands. The collector only records sensors and merges arm/gripper streams over IPC so teach-mode and teleop-mode land in the same schema.
+
+Both paths share session lifecycle: bring-up → record → flush cameras → validate → save → home.
+
+## Sensors (logical)
+
+Without naming lab IPs or vendor debug steps:
+
+- Wrist RGB from an onboard computer (decoded live, flushed at episode end)
+- Scene depth camera
+- Dual tactile streams (GPU inference path matters for rate; CPU fallback is too slow for 30 Hz)
+- Optional fingertip force via serial
+- Arm joint + TCP state; gripper feedback
+
+A USB pedal drives record / save / quit so the operator never leaves the workspace to hit a keyboard.
+
+## Design choices that mattered
+
+- **One episode schema for teach and teleop.** Training code should not care how the human drove the arm.
+- **Flush on stop.** Wrist video buffered over the network needs an explicit end-of-episode drain or the last second disappears.
+- **Session restart cadence.** Long-lived collector processes leak; we force a clean relaunch every N episodes.
+- **Validate before keep.** Broken episodes (empty streams, length mismatch) fail early instead of poisoning a dataset.
+
+## Limits
+
+This is lab infrastructure, not a released product. Hardware bring-up, calibration, and model training live in other repos. Publicly I can only describe interfaces and responsibilities — not configs, network layout, or source.
+
+If you work on contact-rich manipulation, the useful idea is simply: treat **collection as a first-class runtime**, with the same contracts you will need at inference time.

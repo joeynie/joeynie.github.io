@@ -67,41 +67,24 @@ import Icon from "./Icon.astro";
   function initThemeToggle() {
     const themeToggle = document.getElementById('theme-toggle');
     
-    // 获取当前主题
+    // Stored preference wins; otherwise always dark.
     function getCurrentTheme() {
-      const stored = localStorage.getItem('theme');
-      if (stored) return stored;
-      
-      // 检查系统偏好
-      return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      return localStorage.getItem('theme') || 'dark';
     }
 
-    // 设置主题
     function setTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
     }
 
-    // 初始化主题
-    const currentTheme = getCurrentTheme();
-    setTheme(currentTheme);
+    setTheme(getCurrentTheme());
 
-    // 切换主题
     function toggleTheme() {
       const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-      setTheme(newTheme);
+      setTheme(currentTheme === 'light' ? 'dark' : 'light');
     }
 
-    // 绑定点击事件
     themeToggle?.addEventListener('click', toggleTheme);
-
-    // 监听系统主题变化
-    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('theme')) {
-        setTheme(e.matches ? 'light' : 'dark');
-      }
-    });
   }
 
   // 页面加载时初始化

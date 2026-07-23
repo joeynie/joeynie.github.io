@@ -25,10 +25,9 @@ const { title, description, image, pagefindIgnore, article } = Astro.props;
 <html lang="en">
 	<head>
 		<script is:inline>
-			// 防止主题闪烁，在页面加载前设置主题
+			// Prefer stored choice; otherwise always default to dark (ignore OS light preference).
 			(function() {
-				const theme = localStorage.getItem('theme') || 
-					(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+				const theme = localStorage.getItem('theme') || 'dark';
 				document.documentElement.setAttribute('data-theme', theme);
 			})();
 		</script>

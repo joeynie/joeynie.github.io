@@ -1,23 +1,12 @@
 [
-  {
-    "id": "guide"
-  },
-  {
-    "id": "resource"
-  },
-  {
-    "id": "game-development"
-  },
-  {
-    "id": "cpp"
-  },
-  {
-    "id": "project"
-  },
-  {
-    "id": "front end"
-  },
-  {
-    "id": "agent"
-  }
+  { "id": "guide" },
+  { "id": "resource" },
+  { "id": "game-development" },
+  { "id": "cpp" },
+  { "id": "project" },
+  { "id": "front end" },
+  { "id": "agent" },
+  { "id": "robotics" },
+  { "id": "origami" },
+  { "id": "notes" }
 ]

@@ -19,6 +19,10 @@
       {
         "text": "Code",
         "link": "https://github.com/GuidedVLA/GuidedVLA"
+      },
+      {
+        "text": "机器之心",
+        "link": "https://mp.weixin.qq.com/s/7SD3ulzXL2Xg6izWhs7Eng"
       }
     ]
   },
@@ -37,7 +41,15 @@
       },
       {
         "text": "Paper",
-        "link": "https://tacforesight.github.io/ProjectPage/TacForeSight.pdf"
+        "link": "https://arxiv.org/abs/2606.11184"
+      },
+      {
+        "text": "Code",
+        "link": "https://github.com/TacForeSight/TacForeSight"
+      },
+      {
+        "text": "机器之心",
+        "link": "https://mp.weixin.qq.com/s/5kGd-zsOCq_OahJhW88n3w"
       }
     ]
   },

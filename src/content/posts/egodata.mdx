@@ -1,0 +1,64 @@
+---
+title: "What Actually Broke When Labeling Egocentric Hands"
+description: "A few ablations from labeling first-person kitchen video — box IoU vs mask distance, sticky long contacts, and why I stopped asking a VLM to re-cut them."
+image: "../assets/default.webp"
+createdAt: 2026-07-22
+draft: false
+tags:
+  - robotics
+  - notes
+---
+
+I spent a stretch of this summer labeling first-person kitchen video: where the hands touch things, how long a grip lasts, and how to group those grips into something closer to a sub-task. Here is the overall layout I ended up with — hand geometry, contact-driven split, then a separate retarget path into simulation:
+
+![Overview: hand geometry, semantic split, and robot retarget](/img/blog/egodata-pipeline.png)
+
+The rest of this post is not a walkthrough of that diagram. It is about what failed when the obvious baselines met real footage. No repo link.
+
+## Contact: boxes looked fine until they didn't
+
+I tried three ways to decide “hand is touching object” on a ~5‑minute clip (1500 frames at 5 Hz):
+
+| Variant | Flickers | Contact segments | Segments under 0.5 s | Mean length (s) |
+|---------|----------|------------------|---------------------|-----------------|
+| A · Box IoU | 282 | 142 | 73 | 1.25 |
+| B · Raw mask distance | 216 | 109 | 45 | 1.86 |
+| C · Distance + smoothing + hysteresis | 58 | 30 | 0 | 7.11 |
+
+**A** is the usual box overlap rule. It chatters: hands and objects graze in image space, IoU flips on and off, and you get a pile of short scraps.
+
+**B** already helps — measuring mask distance instead of box IoU cuts a lot of junk. But a hard threshold still flickers when the hand hovers near a board or a knife.
+
+**C** adds light temporal filtering and Schmitt-style hysteresis (plus bridging tiny gaps). Flickers drop by ~73% vs B; sub‑half‑second scraps go to zero; average contact length jumps to about seven seconds. That is closer to “one continuous grip” than “one lucky IoU frame.”
+
+Short clips pointed the same way. The lesson was boring and useful: for ego hands, **geometry beats boxes**, and **temporal glue beats a single threshold**.
+
+## Sub-tasks: similarity merge glued the wrong things
+
+For grouping contacts into sub-tasks I compared two ideas:
+
+| Variant | # Sub-tasks | Cross-object merges | “and” in captions |
+|---------|-------------|---------------------|-------------------|
+| A · Fixed blocks + text similarity merge | 15 | 5 (33%) | 16 |
+| B · Split on long gaps / object change | 26 | 0 | 1 |
+
+**A** looked clean on paper — chunk the video, merge neighbors with similar captions. In practice it glued a ~50 s stretch into one “sub-task” that opened a bottle, put down a cup, used the fridge, and moved a pan. The caption became a laundry list of “and … and …”.
+
+**B** is duller: cut when the contact object changes, or when there is a long idle gap. Cross-object merges went to zero. Captions stopped lying about doing five chores at once.
+
+## The sticky cut I refused to “fix”
+
+Contact-based cuts have a cost. Long, close work — continuous knife on garlic, standing at a sink — stays one geometric contact even when a human would name several micro-actions. One garlic-cutting stretch ran ~63 s with almost no flicker; another sink stretch ~48 s.
+
+![Still from the long garlic-cutting contact](/img/blog/egodata-sticky-cut.jpg)
+
+I tried the tempting fix: ask a VLM to re-slice anything longer than N seconds. Equal-time splits looked arbitrary; the model also invented tiny actions that were not in the video. So I dropped that path. If the geometry says one continuous contact, I keep one segment and let a higher-level caption summarize it. Better an honest coarse label than a polished wrong one.
+
+## Takeaways
+
+- Box IoU is too twitchy for ego hand–object contact.
+- Mask distance helps; hysteresis and short-gap bridging help more.
+- Caption similarity is a bad glue for sub-tasks when objects keep changing.
+- Ultra-long contacts are often *correct* under a geometric definition — do not paper over them with an unstable second-stage cut.
+
+If you only want one number: on this clip, going from raw mask distance to filtered contact cut flickers from **216 → 58** and wiped out the sub‑0.5 s scraps entirely.
