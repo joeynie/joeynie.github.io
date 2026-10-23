@@ -76,7 +76,7 @@
     "id": 4,
     "title": "Contact Trajectory Prompting: In-Context Transfer of Contact-Rich Behaviors from a Single Demonstration",
     "authors": "Xian Nie*, Yujie Zang*, Yuhang Zheng*, Yupeng Zheng, Songen Gu, Wendi Chen, Chuan Wen, Cewu Lu, Wenchao Ding, Junchi Yan, Shuicheng Yan. Equal contribution.",
-    "venue": "arXiv preprint",
+    "venue": "IEEE International Conference on Robotics and Automation (ICRA), under review",
     "year": 2026,
     "description": "We encode motion and contact information from a single demonstration into an ordered prompt, enabling a fixed policy to transfer contact-rich behaviors to unseen objects using online sensory feedback.",
     "featured": false,
