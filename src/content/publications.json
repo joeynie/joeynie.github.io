@@ -30,7 +30,7 @@
     "id": 2,
     "title": "TacForeSight: Force-Guided Tactile World Model for Contact-Rich Manipulation",
     "authors": "Yujie Zang*, Yuhang Zheng*, Xian Nie*, Yupeng Zheng, Shuai Tian, Songen Gu, Chen Gao, Zining Wang, Shuicheng Yan, Wenchao Ding",
-    "venue": "IEEE Robotics and Automation Letters (RA-L), under review",
+    "venue": "IEEE Robotics and Automation Letters (RA-L)",
     "year": 2026,
     "description": "A force-guided tactile world model for contact-rich robotic manipulation.",
     "featured": false,
@@ -69,6 +69,29 @@
       {
         "text": "arXiv",
         "link": "https://arxiv.org/abs/2511.15407"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Contact Trajectory Prompting: In-Context Transfer of Contact-Rich Behaviors from a Single Demonstration",
+    "authors": "Xian Nie*, Yujie Zang*, Yuhang Zheng*, Yupeng Zheng, Songen Gu, Wendi Chen, Chuan Wen, Cewu Lu, Wenchao Ding, Junchi Yan, Shuicheng Yan. Equal contribution.",
+    "venue": "arXiv preprint",
+    "year": 2026,
+    "description": "We encode motion and contact information from a single demonstration into an ordered prompt, enabling a fixed policy to transfer contact-rich behaviors to unseen objects using online sensory feedback.",
+    "featured": false,
+    "links": [
+      {
+        "text": "Project",
+        "link": "https://ctp-robotics.github.io/project_page/"
+      },
+      {
+        "text": "arXiv",
+        "link": "https://arxiv.org/abs/2610.18848"
+      },
+      {
+        "text": "Code",
+        "link": "https://github.com/ctp-robotics/CTP"
       }
     ]
   }
